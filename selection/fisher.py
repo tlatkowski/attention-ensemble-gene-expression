@@ -1,8 +1,9 @@
 import logging
 import os
+
 import pandas as pd
 
-import feature_selection
+from selection import feature_selection
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

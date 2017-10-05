@@ -3,10 +3,7 @@ import time
 
 import pandas as pd
 
-import fisher
-import ttest
-import correlation_with_class
-import random_selection
+from selection import correlation_with_class, fisher, random_selection, ttest
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
