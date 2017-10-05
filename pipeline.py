@@ -52,15 +52,15 @@ init = tf.global_variables_initializer()
 with tf.Session() as sess:
     sess.run(tf.initialize_all_variables())
 
-    for i in range(10000):
+    for i in range(hp.num_epochs):
         shuffle_idxs = np.random.permutation(range(146))
-        num_batch = 10
-        for batch in range(num_batch):
-            y_batch = y_actual[shuffle_idxs[batch*14: (batch+1)*14]]
-            x_batch_fisher = x_input['fisher'][:, shuffle_idxs[batch*14: (batch+1)*14]].T
-            x_batch_corr = x_input['corr'][:, shuffle_idxs[batch*14: (batch+1)*14]].T
-            x_batch_ttest = x_input['ttest'][:, shuffle_idxs[batch*14: (batch+1)*14]].T
-            x_batch_random = x_input['random'][:, shuffle_idxs[batch*14: (batch+1)*14]].T
+        num_batches = len(X) // hp.batch_size
+        for batch in range(num_batches):
+            y_batch = y_actual[shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]]
+            x_batch_fisher = x_input['fisher'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
+            x_batch_corr = x_input['corr'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
+            x_batch_ttest = x_input['ttest'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
+            x_batch_random = x_input['random'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
             my_opt, = sess.run([opt], feed_dict={
                 nn_inputs['fisher']: x_batch_fisher,
                 nn_inputs['corr']: x_batch_corr,

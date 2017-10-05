@@ -6,5 +6,7 @@ class Hyperparams:
     attention_size = 10
     activation = tf.nn.tanh
     activation_size = 64
+    batch_size = 10
+    num_epochs = 1000
     selection_methods = ['fisher', 'ttest', 'corr', 'random']
     num_methods = len(selection_methods)
