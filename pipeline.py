@@ -8,7 +8,7 @@ import nn_utils
 from selection import features_utils
 
 sns.set()
-
+logs_path = 'logs/'
 a = np.array([0.0] * 82)
 b = np.array([1.0] * 64)
 c = np.concatenate((a, b), axis=0)
@@ -47,12 +47,17 @@ acc = tf.reduce_mean((pred * y) + ((1 - pred) * (1 - y)))
 loss = tf.losses.sigmoid_cross_entropy(
       multi_class_labels=y, logits=logits_out)
 
+# summaries
+tf.summary.scalar('loss', loss)
+tf.summary.scalar('accuracy', acc)
+merged_summary_op = tf.summary.merge_all()
+
 opt = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
 init = tf.global_variables_initializer()
 with tf.Session() as sess:
-    sess.run(tf.initialize_all_variables())
-
-    for i in range(hp.num_epochs):
+    sess.run(init)
+    summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
+    for epoch in range(hp.num_epochs):
         shuffle_idxs = np.random.permutation(range(146))
         num_batches = len(X) // hp.batch_size
         for batch in range(num_batches):
@@ -61,18 +66,19 @@ with tf.Session() as sess:
             x_batch_corr = x_input['corr'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
             x_batch_ttest = x_input['ttest'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
             x_batch_random = x_input['random'][:, shuffle_idxs[batch*hp.batch_size: (batch+1)*hp.batch_size]].T
-            my_opt, = sess.run([opt], feed_dict={
+            my_opt, summary = sess.run([opt, merged_summary_op], feed_dict={
                 nn_inputs['fisher']: x_batch_fisher,
                 nn_inputs['corr']: x_batch_corr,
                 nn_inputs['ttest']: x_batch_ttest,
                 nn_inputs['random']: x_batch_random,
                 y: y_batch})
-        if i % 1000:
+            summary_writer.add_summary(summary, epoch * num_batches + epoch)
+        if epoch % 1000:
             my_acc, my_att = sess.run([acc, attentions_weights], feed_dict={
                 nn_inputs['fisher']: x_input['fisher'].T,
                 nn_inputs['corr']: x_input['corr'].T,
                 nn_inputs['ttest']: x_input['ttest'].T,
                 nn_inputs['random']: x_input['random'].T,
                 y: y_actual})
-            ax = sns.heatmap(my_att.T)
-            plt.show()
+            # ax = sns.heatmap(my_att.T)
+            # plt.show()
