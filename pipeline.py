@@ -7,19 +7,21 @@ from hyperparams import Hyperparams as hp
 import nn_utils
 from selection import features_utils
 from model.attention_ensemble import AttentionBasedEnsemble
+from data.data_loader import load_data
 
 sns.set()
 logs_path = 'logs/'
-a = np.array([0.0] * 82)
-b = np.array([1.0] * 64)
-c = np.concatenate((a, b), axis=0)
-y_actual = np.array(c).reshape(146, 1)
-
-data_file = 'data/data.tsv'
-df = pd.read_csv(data_file, sep='\t', header=None, index_col=0).T
-X = nn_utils.norm_data(df)
-X['Case'] = ['AUTISM'] * 82 + ['CONTROL'] * 64
-
+# a = np.array([0.0] * 82)
+# b = np.array([1.0] * 64)
+# c = np.concatenate((a, b), axis=0)
+# y_actual = np.array(c).reshape(146, 1)
+#
+# data_file = 'data/data.tsv'
+# df = pd.read_csv(data_file, sep='\t', header=None, index_col=0).T
+# X = nn_utils.norm_data(df)
+# X['Case'] = ['AUTISM'] * 82 + ['CONTROL'] * 64
+X = load_data()
+y_actual = list(X['Labels'])
 x_input = features_utils.execute_selection(hp.selection_methods, X, num_features=hp.num_features)
 
 with tf.Session() as sess:
