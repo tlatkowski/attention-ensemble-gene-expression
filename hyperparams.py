@@ -8,5 +8,6 @@ class Hyperparams:
     activation_size = 64
     batch_size = 10
     num_epochs = 1000
+    eval_every = 10
     selection_methods = ['fisher', 'ttest', 'corr', 'random']
     num_methods = len(selection_methods)
