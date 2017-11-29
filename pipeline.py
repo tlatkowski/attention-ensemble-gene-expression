@@ -3,10 +3,11 @@ import os
 import numpy as np
 import seaborn as sns
 import tensorflow as tf
+from tqdm import tqdm
 
 from data.data_loader import load_data
 from hyperparams import Hyperparams as hp
-from model.attention_ensemble import AttentionBasedEnsemble
+from models.attention_ensemble import AttentionBasedEnsemble
 from selection import features_utils
 
 sns.set()
@@ -20,11 +21,14 @@ x_input = features_utils.execute_selection(hp.selection_methods, X, num_features
 with tf.Session() as sess:
     att_ensemble_model = AttentionBasedEnsemble()
     init = tf.global_variables_initializer()
+    init_local = tf.local_variables_initializer()
     sess.run(init)
+    sess.run(init_local)
     if not os.path.isdir(logs_path):
         os.makedirs(logs_path)
     summary_writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
-    for epoch in range(hp.num_epochs):
+    tqdm_iter = tqdm(range(hp.num_epochs))
+    for epoch in tqdm_iter:
         shuffle_idxs = np.random.permutation(range(146))
         num_batches = len(X) // hp.batch_size
         for batch in range(num_batches):
@@ -38,7 +42,7 @@ with tf.Session() as sess:
                 att_ensemble_model.nn_inputs['corr']: x_batch_corr,
                 att_ensemble_model.nn_inputs['ttest']: x_batch_ttest,
                 att_ensemble_model.nn_inputs['random']: x_batch_random,
-                att_ensemble_model.y: y_batch})
+                att_ensemble_model.labels: y_batch})
             summary_writer.add_summary(summary, epoch * num_batches + epoch)
         if epoch % hp.eval_every:
             acc = sess.run([att_ensemble_model.acc], feed_dict={
@@ -46,7 +50,7 @@ with tf.Session() as sess:
                 att_ensemble_model.nn_inputs['corr']: x_input['corr'].T,
                 att_ensemble_model.nn_inputs['ttest']: x_input['ttest'].T,
                 att_ensemble_model.nn_inputs['random']: x_input['random'].T,
-                att_ensemble_model.y: y_actual})
-            print(acc)
+                att_ensemble_model.labels: y_actual})
+            tqdm_iter.set_postfix(acc=acc)
             # ax = sns.heatmap(my_att.T)
             # plt.show()

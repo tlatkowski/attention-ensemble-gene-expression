@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from nn_utils import norm_data
+from utils.preprocessing import normalize
 
 
 def load_data():
@@ -13,7 +13,7 @@ def load_data():
 
     data_file = 'data/data.tsv'
     df = pd.read_csv(data_file, sep='\t', header=None, index_col=0).T
-    X = norm_data(df)
+    X = normalize(df)
     X['Case'] = ['AUTISM'] * num_autism + ['CONTROL'] * num_control
     X['Labels'] = y_actual
     return X
