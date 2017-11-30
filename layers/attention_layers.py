@@ -1,5 +1,6 @@
 import tensorflow as tf
-from hyperparams import Hyperparams as hp
+
+from utils.hyperparams import Hyperparams as hp
 
 
 def attention_layer(nn_outcomes, attention_size=50):

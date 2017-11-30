@@ -1,9 +1,9 @@
 import tensorflow as tf
 
-from layers.common_layers import init_inputs, logits_layer
+from layers.attention_layers import attention_layer
+from layers.common_layers import init_inputs
 from layers.feed_forward_layers import feed_forward_diff_features
-from layers.attention_layers import attention_layer, attention_layer_tensordot
-from hyperparams import Hyperparams as hp
+from utils.hyperparams import Hyperparams as hp
 
 
 class AttentionBasedEnsemble:

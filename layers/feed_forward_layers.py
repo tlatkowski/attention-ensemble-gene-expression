@@ -1,5 +1,6 @@
-from constants import ACTIVATIONS as ACTIV
 import tensorflow as tf
+
+from utils.constants import ACTIVATIONS as ACT
 
 
 def feed_forward_diff_features(nn_inputs: dict, units, activation):
@@ -13,7 +14,7 @@ def feed_forward_diff_features(nn_inputs: dict, units, activation):
     return nn_outcomes
 
 
-def feed_forward_diff_activations(nn_input, units, activations=[ACTIV.RELU, ACTIV.SIGMOID, ACTIV.TANH]):
+def feed_forward_diff_activations(nn_input, units, activations=[ACT.RELU, ACT.SIGMOID, ACT.TANH]):
     dense_ff = dict()
     for name, activation in activations:
         with tf.name_scope('ff_' + name):
