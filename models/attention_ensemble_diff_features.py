@@ -6,17 +6,18 @@ from layers.feed_forward_layers import feed_forward_diff_features
 from utils.hyperparams import Hyperparams as hp
 
 
-class AttentionBasedEnsemble:
+class AttentionBasedEnsembleFeatures:
 
-    def __init__(self):
+    def __init__(self, selection_methods, num_features, learning_rate=0.01):
 
         with tf.name_scope('input'):
-            self.nn_inputs = init_inputs(hp.num_features, hp.selection_methods)
-            self.labels = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='Y')
+            self.nn_inputs = init_inputs(num_features, selection_methods)
+            self.labels = tf.placeholder(dtype=tf.float32, shape=[None, 1], name='labels')
 
         with tf.name_scope('ff'):
-            feed_forward = feed_forward_diff_features(self.nn_inputs, units=hp.activation_size, activation=hp.activation)
-
+            feed_forward = feed_forward_diff_features(self.nn_inputs,
+                                                      units=hp.activation_size,
+                                                      activation=hp.activation)
         with tf.name_scope('output'):
             out = attention_layer(feed_forward, attention_size=50)
             logits = tf.layers.dense(out, units=1)
@@ -26,7 +27,7 @@ class AttentionBasedEnsemble:
         with tf.name_scope('train'):
             self.loss = tf.losses.sigmoid_cross_entropy(
                   multi_class_labels=self.labels, logits=logits)
-            self.opt = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.loss)
+            self.opt = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.loss)
 
         with tf.name_scope('summaries'):
             self.acc = tf.reduce_mean((predictions * self.labels) + ((1 - predictions) * (1 - self.labels)))

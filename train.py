@@ -6,7 +6,7 @@ import tensorflow as tf
 from tqdm import tqdm
 
 from data.data_loader import load_data
-from models.attention_ensemble import AttentionBasedEnsemble
+from models.attention_ensemble_diff_features import AttentionBasedEnsembleFeatures
 from selection import features_utils
 from utils.batch_creator import BatchCreator
 from utils.hyperparams import Hyperparams as hp
@@ -22,7 +22,7 @@ y_actual = np.reshape(y_actual, (-1, 1))
 x_input = features_utils.execute_selection(hp.selection_methods, X, num_features=hp.num_features, force=False)
 
 with tf.Session() as sess:
-    model = AttentionBasedEnsemble()
+    model = AttentionBasedEnsembleFeatures(hp.selection_methods, hp.num_features)
     init = tf.global_variables_initializer()
     init_local = tf.local_variables_initializer()
     sess.run(init)

@@ -23,3 +23,19 @@ def feed_forward_diff_activations(nn_input, units, activations=[ACT.RELU, ACT.SI
                                                      activation=activation,
                                                      name=name + '_ff')
     return dense_ff
+
+
+def feed_forward_diff_layers(nn_inputs: dict, nets: dict, activation=ACT.RELU):
+    dense_ff = dict()
+    for name, layers in nets.items():
+        with tf.name_scope('ff_' + name):
+            for i, units in enumerate(layers):
+                if i == 0:
+                    nn_input = nn_inputs[name]
+                else:
+                    nn_input = dense_ff['ff_{}_{}'.format(name, i - 1)]
+
+                dense_ff['ff_{}_{}'.format(name, i)] = tf.layers.dense(nn_input,
+                                                                           units=units,
+                                                                           activation=activation[1])
+    return dense_ff
